@@ -1,0 +1,43 @@
+{
+  "extends": "@tsconfig/svelte/tsconfig.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "resolveJsonModule": true,
+    /**
+     * Typecheck JS in `.svelte` and `.js` files by default.
+     * Disable checkJs if you'd like to use dynamic types in JS.
+     * Note that setting allowJs false does not prevent the use
+     * of JS in `.svelte` files.
+     */
+    "allowJs": true,
+    "checkJs": true,
+    "isolatedModules": true
+  },
+  "include": [
+    "src/**/*.d.ts",
+    "src/**/*.ts",
+    "src/**/*.js",
+    "src/**/*.svelte",
+    "src/models/crs.ts",
+    "src/models/crs.ts",
+    "src/models/deferredDefect.ts",
+    "src/models/deferredDefect.ts",
+    "src/models/discrepancy.ts",
+    "src/models/discrepancy.ts",
+    "src/models/due.ts",
+    "src/models/due.ts",
+    "src/models/flight.ts",
+    "src/models/flight.ts",
+    "src/models/helicopter.ts",
+    "src/models/helicopter.ts",
+    "src/models/motor.ts",
+    "src/models/motor.ts"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
+}

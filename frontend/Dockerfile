@@ -1,13 +1,9 @@
-FROM node:12 as build
-WORKDIR /app
-ENV PATH /app/node_modules/.bin:$PATH
-COPY ./package*.json /app/
-RUN npm install --silent
-COPY . /app
-RUN npm run build
-
+FROM node:16 as build
 FROM nginx:1.16.0-alpine
-COPY --from=build /app/public /usr/share/nginx/html
-COPY ./front.conf /etc/nginx/conf.d/default.conf
+COPY ./front.conf /front.conf
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+
+COPY ./start.sh /start.sh
+RUN chmod 777 /start.sh
+RUN chmod +x /start.sh
+CMD /start.sh

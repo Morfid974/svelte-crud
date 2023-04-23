@@ -3,46 +3,35 @@ services:
   backend:
     build: backend/
     ports:
-      - "3000:3000"
+      - ${BACKPORT}:3000
     depends_on:
       - postgres
-      - elasticsearch
-      - mongo
-      - redis
     links:
       - postgres
-      - elasticsearch
-      - mongo
-      - redis
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DBNAME}
+      - DBPORT=${DBPORT}
+    volumes:
+      - ./backend/app:/app/backend
   frontend:
     build: frontend/
     ports:
-      - "8080:80"
+      - ${FRONTPORT}:80
     links:
       - backend
-  mongo:
-    hostname: mongo
-    image: mongo
-    ports:
-      - "27017:27017"
-  redis:
-    hostname: redis
-    image: redis:6.0.6-alpine
-    ports:
-      - "6379:6379"
-  elasticsearch:
-    hostname: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.8.1
-    ports:
-      - "9200:9200"
-      - "9300:9300"
     environment:
-      - discovery.type=single-node
+      - BACKPORT=${BACKPORT}
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html
   postgres:
     image: postgres:10-alpine
     ports:
-      - "5432:5432"
+      - ${DBPORT}:5432
+    volumes:
+      - ./persistantdb/data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_USER=node
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=books
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DBNAME}
