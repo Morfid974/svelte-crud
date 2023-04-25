@@ -28,23 +28,15 @@
 		author: "",
 		description: "",
 	};
-	let postgresactive = true;
-	let currentdb = "postgres";
-	function setPostgres() {
-		books = [];
-		postgresactive = true;
-		currentdb = "postgres";
-		getBooks();
-	}
 
 	function getBooks() {
-		axios.get(`/books/${currentdb}`).then((res) => {
+		axios.get("/books").then((res) => {
 			books = res.data;
 		});
 	}
 
 	function removeBook(bookID) {
-		const path = `/books/${currentdb}/${bookID.book._id}`;
+		const path = `/books/${bookID.book._id}`;
 		axios
 			.delete(path)
 			.then(() => {
@@ -72,7 +64,7 @@
 			author: addBookForm.author,
 			description: addBookForm.description,
 		};
-		const path = `/books/${currentdb}`;
+		const path = "/books";
 		axios
 			.post(path, payload)
 			.then(() => {
@@ -96,7 +88,7 @@
 			author: editForm.author,
 			description: editForm.description,
 		};
-		const path = `/books/${currentdb}/${editForm._id}`;
+		const path = `/books/${editForm._id}`;
 		axios
 			.put(path, payload)
 			.then(() => {

@@ -17,11 +17,11 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.use('/books/', router);
-router.get('/postgres/', postgres.getBooks);
-router.get('/postgres/:id', postgres.getBookById);
-router.post('/postgres/', postgres.postBook);
-router.put('/postgres/:id', postgres.updateBook);
-router.delete('/postgres/:id', postgres.deleteBook);
+router.get('/', postgres.getBooks);
+router.get('/:id', postgres.getBookById);
+router.post('/', postgres.postBook);
+router.put('/:id', postgres.updateBook);
+router.delete('/:id', postgres.deleteBook);
 
 const server = app.listen(3000, function () {
   console.log('Backend running!');
