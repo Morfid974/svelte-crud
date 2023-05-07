@@ -15,6 +15,7 @@ services:
       - DBPORT=${DBPORT}
       - ADMINLOGIN=${ADMINLOGIN}
       - ADMINPASSWORD=${ADMINPASSWORD}
+      - SECRET_KEY=${SECRET_KEY}
     volumes:
       - ./backend/app:/app/backend
   frontend:
@@ -28,7 +29,7 @@ services:
     volumes:
       - ./frontend/dist:/usr/share/nginx/html
   postgres:
-    image: postgres:10-alpine
+    image: postgres:15.2-alpine
     ports:
       - ${DBPORT}:5432
     volumes:

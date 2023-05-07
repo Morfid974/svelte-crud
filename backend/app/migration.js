@@ -1,5 +1,6 @@
 const db = require('./db')
 const { pool } = db
+const bcrypt = require("bcrypt");
 
 exports.postgresMigration = async function createTable() {
   let init_instructions =
@@ -24,58 +25,60 @@ exports.postgresMigration = async function createTable() {
           client.query(`SELECT intvalue FROM parameter WHERE name = 'version';`, async (err, res) => {
             if (err) console.log(`Cannot get current version ->`, err);
             if (res) {
-              let version = parseInt(res.rows[0]['intvalue'])
-              console.log(`Current version ${version}`)
-              let instructions = [
-                `CREATE TABLE IF NOT EXISTS user_role (
+              bcrypt.hash(process.env.ADMINPASSWORD, 10, async function (err, hash) {
+                let version = parseInt(res.rows[0]['intvalue'])
+                console.log(`Current version ${version}`)
+                let instructions = [
+                  `CREATE TABLE IF NOT EXISTS user_role (
                 _id SERIAL PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
                 is_admin BOOLEAN);`,
-                `INSERT INTO user_role(name, is_admin) VALUES
+                  `INSERT INTO user_role(name, is_admin) VALUES
                 ('Administrators', TRUE);`,
-                `CREATE EXTENSION pgcrypto;`,
-                `CREATE TABLE IF NOT EXISTS softwareuser (
+                  `CREATE TABLE IF NOT EXISTS softwareuser (
                   _id SERIAL PRIMARY KEY,
                   name VARCHAR(255) NOT NULL,
+                  login VARCHAR(255) NOT NULL,
                   password VARCHAR(255) NOT NULL);`,
-                `INSERT INTO softwareuser(name, password) VALUES
-                  ('${process.env.ADMINLOGIN}', crypt('${process.env.ADMINPASSWORD}', gen_salt('bf')));`,
-                `CREATE TABLE IF NOT EXISTS softwareuser_user_role (
+                  `INSERT INTO softwareuser(name, login, password) VALUES
+                  ('${process.env.ADMINLOGIN}', '${process.env.ADMINLOGIN}', '${hash}');`,
+                  `CREATE TABLE IF NOT EXISTS softwareuser_user_role (
                     user_id int REFERENCES softwareuser (_id) ON UPDATE CASCADE ON DELETE CASCADE
                   , user_role_id int REFERENCES user_role (_id) ON UPDATE CASCADE
                   , CONSTRAINT user_user_role_pkey PRIMARY KEY (user_id, user_role_id));`,
-                `INSERT INTO softwareuser_user_role(user_id, user_role_id) VALUES
+                  `INSERT INTO softwareuser_user_role(user_id, user_role_id) VALUES
                     (1, 1);`,
-                `CREATE TABLE IF NOT EXISTS books (
+                  `CREATE TABLE IF NOT EXISTS books (
                     _id SERIAL PRIMARY KEY,
                     title VARCHAR(255) NOT NULL,
                     author VARCHAR(255) NOT NULL,
                     description VARCHAR(255) NOT NULL);`,
-                `TRUNCATE TABLE books;`,
-                `INSERT INTO books(title, author, description) VALUES
+                  `TRUNCATE TABLE books;`,
+                  `INSERT INTO books(title, author, description) VALUES
                     ('PostgreSQL 11', 'Simon Riggs', 'Administration cookbook');`,
-              ]
-              if (instructions.length > version) {
-                instructions.splice(0, version)
-                console.log(`Updating ${instructions.length} instructions`)
-                //await instructions.forEach(async function callback(instruction, index) {
-                for (const [index, instruction] of instructions.entries()) {
-                  client.query(instruction, (err, res) => {
-                    if (err) {
-                      console.log(`Error on migration ${index + version + 1} ->`, err);
-                    }
-                    if (res) { console.log(`Postgres succesfully migrated to version ${index + version + 1}`); }
+                ]
+                if (instructions.length > version) {
+                  instructions.splice(0, version)
+                  console.log(`Updating ${instructions.length} instructions`)
+                  //await instructions.forEach(async function callback(instruction, index) {
+                  for (const [index, instruction] of instructions.entries()) {
+                    client.query(instruction, (err, res) => {
+                      if (err) {
+                        console.log(`Error on migration ${index + version + 1} ->`, err);
+                      }
+                      if (res) { console.log(`Postgres succesfully migrated to version ${index + version + 1}`); }
+                    });
+
+                  }
+
+                  await client.query(`UPDATE parameter SET intvalue = ${instructions.length} WHERE name = 'version'`, (err, res) => {
+                    if (err) console.log(`Cannot update version number ->`, err);
+                    if (res) { console.log(`Migration(s) done to version ${instructions.length}`); }
                   });
-
+                } else {
+                  console.log('No migration needed')
                 }
-
-                await client.query(`UPDATE parameter SET intvalue = ${instructions.length} WHERE name = 'version'`, (err, res) => {
-                  if (err) console.log(`Cannot update version number ->`, err);
-                  if (res) { console.log(`Migration(s) done to version ${instructions.length}`); }
-                });
-              } else {
-                console.log('No migration needed')
-              }
+              })
             }
           });
       }
