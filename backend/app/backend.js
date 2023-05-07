@@ -2,12 +2,12 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('permissive-cors');
-const postgres = require('./postgres.js');
+const migration = require('./migration.js');
 const bookRoutes = require('./Routes/bookRoutes')
 
 console.log('Start migrations');
 setTimeout(function () {
-  postgres.postgresMigration();
+  migration.postgresMigration();
 }, 3000);
 
 app.use(cors());
