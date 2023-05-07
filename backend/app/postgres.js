@@ -1,12 +1,5 @@
-const { Pool } = require('pg');
-const pool = new Pool({
-  user: process.env.POSTGRES_USER,
-  host: "postgres",
-  database: process.env.POSTGRES_DB,
-  password: process.env.POSTGRES_PASSWORD,
-  port: process.env.DBPORT,
-  connectionTimeoutMillis: 5000,
-});
+const db = require('./db')
+const { pool } = db
 
 exports.postgresMigration = async function createTable() {
   let init_instructions =
@@ -88,51 +81,4 @@ exports.postgresMigration = async function createTable() {
       }
     });
   });
-};
-
-exports.getBooks = async (req, res) => {
-  const {
-    rows
-  } = await pool.query('SELECT * FROM books;');
-  res.send(rows);
-};
-
-exports.getBookById = async (req, res) => {
-  console.log('req')
-  console.log(req)
-  const {
-    rows
-  } = await pool.query('SELECT * FROM books WHERE _id = $1;', [req.params.id]);
-  res.send(rows[0]);
-};
-
-exports.postBook = async (req, res) => {
-  const {
-    title,
-    author,
-    description
-  } = req.body;
-  const {
-    rows
-  } = await pool.query('INSERT INTO books(title, author, description) VALUES($1, $2, $3);', [title, author, description]);
-  res.json(rows);
-};
-
-exports.updateBook = async (req, res) => {
-  const {
-    title,
-    author,
-    description
-  } = req.body;
-  const {
-    rows
-  } = await pool.query('UPDATE books SET title = $1, author = $2, description = $3 WHERE _id = $4;', [title, author, description, req.params.id]);
-  res.json(rows);
-};
-
-exports.deleteBook = async (req, res) => {
-  const {
-    rows
-  } = await pool.query('DELETE FROM books WHERE _id = $1;', [req.params.id]);
-  res.json(rows);
 };
