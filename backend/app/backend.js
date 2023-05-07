@@ -14,8 +14,8 @@ setTimeout(function () {
 app.use(cors());
 app.use(bodyParser.json());
 
-app.use('/books/', bookRoutes);
-app.use('/login/', userRoutes);
+app.use('/backend/books/', bookRoutes);
+app.use('/backend/login/', userRoutes);
 const server = app.listen(3000, function () {
   console.log('Backend running!');
 });

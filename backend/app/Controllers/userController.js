@@ -32,13 +32,16 @@ const login = async (req, res) => {
                         message: "User signed in!",
                         token: token,
                     });
+                    console.log('good')
                 }
                 else {
                     //Declaring the errors
-                    if (result != true)
+                    if (result != true) {
                         res.status(400).json({
                             error: "Wrong password!",
                         });
+                        console.log('not good')
+                    }
                 }
             })
         }

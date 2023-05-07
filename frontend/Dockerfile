@@ -1,5 +1,5 @@
-FROM node:16 as build
-FROM nginx:1.16.0-alpine
+FROM node:20 as build
+FROM nginx:1.23.4-alpine
 COPY ./front.conf /front.conf
 EXPOSE 80
 
