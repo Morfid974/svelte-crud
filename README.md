@@ -13,6 +13,7 @@ package.json is read on image creation. If you wish to add dependencies, clear b
 - Env file variables
 Variable                      | Default value  | Description
 ----------------------------- | -------------- | --------------
+
 POSTGRES_PASSWORD             | mypostgrespwd  | PostgreSQL password
 POSTGRES_USER                 | mypostgresuser | PostgreSQL login
 POSTGRES_DBNAME               | mydbname       | PostgreSQL database name
