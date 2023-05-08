@@ -56,8 +56,12 @@ exports.postgresMigration = async function createTable() {
                   `TRUNCATE TABLE books;`,
                   `INSERT INTO books(title, author, description) VALUES
                     ('PostgreSQL 11', 'Simon Riggs', 'Administration cookbook');`,
+                  `CREATE TABLE IF NOT EXISTS blacklistedtoken (
+                      _id SERIAL PRIMARY KEY,
+                      token VARCHAR(255) NOT NULL);`,
                 ]
                 if (instructions.length > version) {
+                  let currentVersion = instructions.length
                   instructions.splice(0, version)
                   console.log(`Updating ${instructions.length} instructions`)
                   //await instructions.forEach(async function callback(instruction, index) {
@@ -73,7 +77,7 @@ exports.postgresMigration = async function createTable() {
 
                   await client.query(`UPDATE parameter SET intvalue = ${instructions.length} WHERE name = 'version'`, (err, res) => {
                     if (err) console.log(`Cannot update version number ->`, err);
-                    if (res) { console.log(`Migration(s) done to version ${instructions.length}`); }
+                    if (res) { console.log(`Migration(s) done to version ${currentVersion}`); }
                   });
                 } else {
                   console.log('No migration needed')

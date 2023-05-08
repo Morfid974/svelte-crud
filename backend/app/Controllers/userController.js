@@ -85,26 +85,45 @@ const refreshToken = async (req, res) => {
                 error: "Refresh token expired!",
             });
         }
-        const login = claims.login
-        const data = await pool.query(`SELECT * FROM softwareuser WHERE login= $1;`, [login])
-        const user = data.rows;
-        if (user.length === 0) {
-            return res.status(401).json({
-                error: "User is not existing anymore",
-            });
-        }
-        const token = jwt.sign(
-            {
-                login: login,
-            },
-            process.env.SECRET_KEY,
-            { expiresIn: process.env.ACCESS_TOKEN_VALIDITY_MINUTES + "m" }
-        );
-        res.cookie("access_token", token, {
-            httpOnly: true,
-            secure: true,
-        }).status(200).send(userInformation(user[0]))
+        if (await tokenNotInBlackList(req.cookies['refresh_token'])) {
+            const login = claims.login
+            const data = await pool.query(`SELECT * FROM softwareuser WHERE login= $1;`, [login])
+            const user = data.rows;
+            if (user.length === 0) {
+                return res.status(401).json({
+                    error: "User is not existing anymore",
+                });
+            }
+            const token = jwt.sign(
+                {
+                    login: login,
+                },
+                process.env.SECRET_KEY,
+                { expiresIn: process.env.ACCESS_TOKEN_VALIDITY_MINUTES + "m" }
+            );
+            res.cookie("access_token", token, {
+                httpOnly: true,
+                secure: true,
+            }).status(200).send(userInformation(user[0]))
+        } else { res.status(401).send({ message: "Token blacklisted!" }) }
     })
+}
+
+const tokenNotInBlackList = async (token) => {
+    const data = await pool.query(`SELECT * FROM blacklistedtoken WHERE token = $1;`, [token])
+    const blacklist = data.rows;
+    if (blacklist.length == 0) {
+        return true
+    } else {
+        return false
+    }
+}
+
+const logout = async (req, res) => {
+    const access_token = req.cookies['access_token']
+    const refresh_token = req.cookies['refresh_token']
+    await pool.query(`INSERT INTO blacklistedtoken(token) VALUES ($1),($2);`, [access_token, refresh_token])
+    res.status(200).send({ message: "Successfully logout!" })
 }
 
 const identify = async (req, res) => {
@@ -117,20 +136,25 @@ const identify = async (req, res) => {
         if (err) {
             return catchError(err, res, req);
         }
-        const login = claims.login
-        const data = await pool.query(`SELECT name, login FROM softwareuser WHERE login= $1;`, [login])
-        const user = data.rows;
-        if (user.length === 0) {
-            return res.status(401).json({
-                error: "User is not existing anymore",
-            });
+        if (await tokenNotInBlackList(access_token)) {
+            const login = claims.login
+            const data = await pool.query(`SELECT name, login FROM softwareuser WHERE login= $1;`, [login])
+            const user = data.rows;
+            if (user.length === 0) {
+                return res.status(401).json({
+                    error: "User is not existing anymore",
+                });
+            }
+            res.status(200).send(user[0])
+        } else {
+            res.status(401).send({ message: "Token blacklisted!" })
         }
-        res.status(200).send(user[0])
     })
 
 }
 
 module.exports = {
     login,
-    identify
+    identify,
+    logout
 };

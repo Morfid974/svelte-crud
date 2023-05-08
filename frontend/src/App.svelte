@@ -4,6 +4,7 @@
 	import Home from "./routes/home.svelte";
 	import Books from "./routes/books.svelte";
 	import Login from "./routes/login.svelte";
+	import LogOut from "./routes/logout.svelte";
 	import NotFound from "./routes/404.svelte";
 	import { push } from "svelte-spa-router";
 	import { onMount } from "svelte";
@@ -13,6 +14,7 @@
 		"/": Home,
 		"/books": Books,
 		"/login": Login,
+		"/logout": LogOut,
 		// At the end !
 		"*": NotFound,
 	};

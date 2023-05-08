@@ -18,6 +18,6 @@ app.use(cookieParser())
 app.use('/backend/books/', bookRoutes);
 app.use('/backend/login/', userRoutes);
 const server = app.listen(3000, function () {
-  console.log('Backend running!');
+  console.log('Backend running, wait for migrations!');
 });
 
