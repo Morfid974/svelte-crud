@@ -11,6 +11,7 @@ package.json is read on image creation. If you wish to add dependencies, clear b
 - Manage credentials through jwt and blacklist on logout
 
 - Env file variables
+
 |Variable                       | Default value  | Description                                              |
 |-------------------------------|----------------|----------------------------------------------------------|
 |POSTGRES_PASSWORD              | mypostgrespwd  | PostgreSQL password                                      |
