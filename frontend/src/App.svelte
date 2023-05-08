@@ -1,16 +1,32 @@
 <script lang="ts">
+	import axios from "axios";
 	import Router from "svelte-spa-router";
 	import Home from "./routes/home.svelte";
-	import NavLink from "./components/NavLink.svelte";
+	import Books from "./routes/books.svelte";
 	import Login from "./routes/login.svelte";
 	import NotFound from "./routes/404.svelte";
-	//import jwt from "jsonwebtoken";
+	import { push } from "svelte-spa-router";
+	import { onMount } from "svelte";
+	import { updateUser } from "./store/store";
+
 	const routes = {
 		"/": Home,
+		"/books": Books,
 		"/login": Login,
 		// At the end !
 		"*": NotFound,
 	};
+	onMount(async () => {
+		const path = "/backend/login/identify";
+		axios
+			.post(path, { withCredentials: true })
+			.then((response) => {
+				updateUser({ userInformation: response.data });
+			})
+			.catch(() => {
+				push("/login");
+			});
+	});
 </script>
 
 <head>
@@ -19,10 +35,6 @@
 		href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
 	/>
 </head>
-<nav>
-	<NavLink to="/">Home</NavLink>
-	<NavLink to="/login">Login</NavLink>
-</nav>
 <Router {routes} />
 
 <style>

@@ -1,23 +1,26 @@
 <script>
     import axios from "axios";
+    import { push } from "svelte-spa-router";
+    import { updateUser } from "../store/store";
+
     let password = "";
     let login = "";
-    let name = "";
+    let errorMessage = "";
     function submit() {
-        console.log("on submit");
-        console.log(login, password);
+        errorMessage = "";
         const payload = {
             login: login,
             password: password,
         };
         const path = "/backend/login";
         axios
-            .post(path, payload)
-            .then(() => {
-                console.log("envoyé");
+            .post(path, payload, { withCredentials: true })
+            .then((response) => {
+                updateUser({ userInformation: response.data });
+                push("/");
             })
             .catch((error) => {
-                console.error(error);
+                errorMessage = error.response.data.error;
             });
     }
 </script>
@@ -48,10 +51,14 @@
         <button class="w-100 btn btn-lg btn-primary" type="submit"
             >Sign in</button
         >
+        <div class="error-login">{errorMessage}</div>
     </form>
 </div>
 
 <style>
+    .error-login {
+        color: red;
+    }
     .form-signin {
         max-width: 330px;
         padding: 15px;
