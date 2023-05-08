@@ -13,6 +13,6 @@ package.json is read on image creation. If you wish to add dependencies, clear b
 - PostgreSQL
 Stored locally in persistantdb folder
 ### usage
-copy .env.example to .env and edit values
-`docker-compose up -d` and open [http://localhost:[FRONTPORT from .env file]]
+- copy .env.example to .env and edit values
+- `docker-compose up -d` and open [http://localhost:[FRONTPORT from .env file]]
 
