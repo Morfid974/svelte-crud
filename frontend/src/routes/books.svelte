@@ -7,14 +7,15 @@
     import Fa from "svelte-fa";
     import { faWrench, faPlus } from "@fortawesome/free-solid-svg-icons";
     import { queryBooks, books } from "../store/store";
+    import { Book } from "../models/book";
 
-    var addBookForm = {
+    let addBookForm: Book = {
         title: "",
         author: "",
         description: "",
     };
-    var editForm = {
-        _id: "",
+    let editForm: Book = {
+        _id: null,
         title: "",
         author: "",
         description: "",
@@ -38,13 +39,17 @@
     }
 
     function initForm() {
-        addBookForm.title = "";
-        addBookForm.author = "";
-        addBookForm.description = "";
-        editForm._id = "";
-        editForm.title = "";
-        editForm.author = "";
-        editForm.description = "";
+        addBookForm = {
+            title: "",
+            author: "",
+            description: "",
+        };
+        editForm = {
+            _id: null,
+            title: "",
+            author: "",
+            description: "",
+        };
     }
 
     function addBook() {
@@ -69,7 +74,6 @@
     function editBook(book) {
         updatetoggle();
         editForm = book.book;
-        console.log("ca plop", editForm, book);
     }
 
     function updateBook() {
@@ -351,13 +355,6 @@
                                                 stroke="currentColor"
                                                 aria-hidden="true"
                                             >
-                                                <!--
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-                                                />
-                                                -->
                                                 <Fa icon={faWrench} />
                                             </svg>
                                         </div>
@@ -371,7 +368,6 @@
                                                 Update book
                                             </h3>
                                             <div class="mt-2">
-                                                <!--<p class="text-sm text-gray-500">Are you sure you want to deactivate your account? All of your data will be permanently removed. This action cannot be undone.</p>-->
                                                 <div>Title:</div>
                                                 <input
                                                     type="text"
