@@ -68,8 +68,16 @@
         editTableForm = table.table;
     }
     function removeTable(table) {
-        //TODO:
-        console.log("on remove table", table);
+        const path = `/backend/settings/tables/${table.table._id}/${table.table.tablename}`;
+        axios
+            .delete(path)
+            .then(() => {
+                getTables();
+            })
+            .catch((error) => {
+                console.error(error);
+                getTables();
+            });
     }
 </script>
 

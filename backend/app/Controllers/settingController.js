@@ -23,7 +23,17 @@ const postTable = async (req, res) => {
     res.json(rows);
 };
 
+const deleteTable = async (req, res) => {
+    await userControl(req, res)
+    await pool.query(`DROP TABLE IF EXISTS ${req.params.name};`)
+    const {
+        rows
+    } = await pool.query('DELETE FROM tablelist WHERE _id = $1;', [req.params.id]);
+    res.json(rows);
+};
+
 module.exports = {
     getTables,
-    postTable
+    postTable,
+    deleteTable
 };
