@@ -5,6 +5,7 @@
 	import Books from "./routes/books.svelte";
 	import Login from "./routes/login.svelte";
 	import LogOut from "./routes/logout.svelte";
+	import TableEditor from "./routes/tableeditor.svelte";
 	import NotFound from "./routes/404.svelte";
 	import { push } from "svelte-spa-router";
 	import { onMount } from "svelte";
@@ -15,6 +16,7 @@
 		"/books": Books,
 		"/login": Login,
 		"/logout": LogOut,
+		"/settings/tables": TableEditor,
 		// At the end !
 		"*": NotFound,
 	};
@@ -23,6 +25,7 @@
 		axios
 			.post(path, { withCredentials: true })
 			.then((response) => {
+				console.log(response);
 				updateUser({ userInformation: response.data });
 			})
 			.catch(() => {
@@ -31,12 +34,6 @@
 	});
 </script>
 
-<head>
-	<link
-		rel="stylesheet"
-		href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-	/>
-</head>
 <Router {routes} />
 
 <style>

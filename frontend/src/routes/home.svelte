@@ -6,6 +6,6 @@
 <NavBar />
 {#if $user}
     <div>
-        <h1>Hi {$user.name}</h1>
+        <h1 class="text-lg">Hi {$user.name}</h1>
     </div>
 {/if}

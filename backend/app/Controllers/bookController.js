@@ -1,7 +1,10 @@
 const db = require('../db')
 const { pool } = db
+const userController = require('../Controllers/userController')
+const { userControl } = userController
 
 const getBooks = async (req, res) => {
+    await userControl(req, res)
     const {
         rows
     } = await pool.query('SELECT * FROM books;');
@@ -9,8 +12,7 @@ const getBooks = async (req, res) => {
 };
 
 const getBookById = async (req, res) => {
-    console.log('req')
-    console.log(req)
+    await userControl(req, res)
     const {
         rows
     } = await pool.query('SELECT * FROM books WHERE _id = $1;', [req.params.id]);
@@ -18,6 +20,7 @@ const getBookById = async (req, res) => {
 };
 
 const postBook = async (req, res) => {
+    await userControl(req, res)
     const {
         title,
         author,
@@ -30,6 +33,7 @@ const postBook = async (req, res) => {
 };
 
 const updateBook = async (req, res) => {
+    await userControl(req, res)
     const {
         title,
         author,
@@ -42,6 +46,7 @@ const updateBook = async (req, res) => {
 };
 
 const deleteBook = async (req, res) => {
+    await userControl(req, res)
     const {
         rows
     } = await pool.query('DELETE FROM books WHERE _id = $1;', [req.params.id]);

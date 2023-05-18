@@ -59,6 +59,16 @@ exports.postgresMigration = async function createTable() {
                   `CREATE TABLE IF NOT EXISTS blacklistedtoken (
                       _id SERIAL PRIMARY KEY,
                       token VARCHAR(255) NOT NULL);`,
+                  `CREATE TABLE IF NOT EXISTS tablelist (
+                        _id SERIAL PRIMARY KEY,
+                        tablename VARCHAR(255) NOT NULL,
+                        is_technical BOOLEAN);`,
+                  `INSERT INTO tablelist(tablename, is_technical) VALUES
+                    ('user_role', TRUE),
+                    ('softwareuser', TRUE),
+                    ('softwareuser_user_role', TRUE),
+                    ('books', FALSE),
+                    ('blacklistedtoken', TRUE);`,
                 ]
                 if (instructions.length > version) {
                   let currentVersion = instructions.length
@@ -70,17 +80,17 @@ exports.postgresMigration = async function createTable() {
                       if (err) {
                         console.log(`Error on migration ${index + version + 1} ->`, err);
                       }
-                      if (res) { console.log(`Postgres succesfully migrated to version ${index + version + 1}`); }
+                      if (res) { console.log(`Postgres datas succesfully migrated to version ${index + version + 1}`); }
                     });
 
                   }
 
-                  await client.query(`UPDATE parameter SET intvalue = ${instructions.length} WHERE name = 'version'`, (err, res) => {
+                  await client.query(`UPDATE parameter SET intvalue = ${currentVersion} WHERE name = 'version'`, (err, res) => {
                     if (err) console.log(`Cannot update version number ->`, err);
-                    if (res) { console.log(`Migration(s) done to version ${currentVersion}`); }
+                    if (res) { console.log(`Migration(s) done to version ${currentVersion}, you are ready to go`); }
                   });
                 } else {
-                  console.log('No migration needed')
+                  console.log('No migration needed, you are ready to go')
                 }
               })
             }
