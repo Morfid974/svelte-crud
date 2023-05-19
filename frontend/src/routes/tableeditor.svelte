@@ -1,7 +1,12 @@
 <script lang="ts">
     import type { Table } from "../models/table";
     import NavBar from "../components/NavBar.svelte";
-    import { queryTables, queryDataTypes, tables } from "../store/store";
+    import {
+        queryTables,
+        queryDataTypes,
+        tables,
+        datatypes,
+    } from "../store/store";
     import { onMount } from "svelte";
     import { fly, fade } from "svelte/transition";
     import axios from "axios";
@@ -12,6 +17,7 @@
         faTimes,
         faWrench,
     } from "@fortawesome/free-solid-svg-icons";
+    import type { Field } from "src/models/field";
 
     let addTableForm: Table = {
         tablename: "",
@@ -23,11 +29,27 @@
     };
     let addopen = false;
     let updateopen = false;
+    let newField: Field = {
+        _id: null,
+        name: "",
+        type: null,
+        define_length: null,
+        default_length: null,
+        max_length: null,
+        define_precision: null,
+        default_precision: null,
+        max_precision: null,
+        description: null,
+    };
 
     onMount(async () => {
         await getTables();
         await queryDataTypes();
     });
+
+    function onChangeFieldType(event) {
+        console.log(event);
+    }
 
     async function getTables() {
         await queryTables();
@@ -101,6 +123,10 @@
                 console.error(error);
                 getTables();
             });
+    }
+    function addField() {
+        //TODO: addField
+        console.log("on addField");
     }
 </script>
 
@@ -267,10 +293,10 @@
 
             <div class="fixed inset-0 z-10 overflow-y-auto">
                 <div
-                    class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
+                    class="min-w-full flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
                 >
                     <div
-                        class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
+                        class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full md:w-auto lg:w-auto"
                         transition:fly
                     >
                         <div
@@ -315,6 +341,102 @@
                                                     class="py-3 px-4 block w-full border-2 border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 shadow-sm"
                                                     placeholder="Table name"
                                                 />
+                                            </div>
+                                        </div>
+                                        <div class="relative">
+                                            <label
+                                                for="edittitle"
+                                                class="block text-sm font-bold ml-1 mb-2 text-gray-900 dark:text-white"
+                                                >Fields</label
+                                            >
+                                            <div
+                                                class="border-2 border-gray-200 rounded-md shadow-sm"
+                                            >
+                                                <table>
+                                                    <thead
+                                                        class="bg-gray-200 border-b"
+                                                    >
+                                                        <tr>
+                                                            <th
+                                                                scope="col"
+                                                                class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                                                            >
+                                                                Name
+                                                            </th>
+                                                            <th
+                                                                scope="col"
+                                                                class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                                                            >
+                                                                Type
+                                                            </th>
+                                                            <th
+                                                                scope="col"
+                                                                class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                                                            >
+                                                                Description
+                                                            </th>
+                                                            <th
+                                                                scope="col"
+                                                                class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                                                                >Action</th
+                                                            ></tr
+                                                        >
+                                                    </thead>
+                                                    <tbody class="bg-gray-200">
+                                                        <!--TODO: Load existing fields -->
+                                                        <tr>
+                                                            <td
+                                                                class="bg-gray-200"
+                                                                ><input
+                                                                    class="px-2 border-gray-200"
+                                                                    type="text"
+                                                                    bind:value={newField.name}
+                                                                    placeholder="Field name"
+                                                                /></td
+                                                            >
+                                                            <td
+                                                                class="bg-gray-200"
+                                                                ><select
+                                                                    class="px-2 border-gray-200"
+                                                                    value={newField.type}
+                                                                    on:change={(
+                                                                        $event
+                                                                    ) =>
+                                                                        onChangeFieldType(
+                                                                            $event
+                                                                        )}
+                                                                >
+                                                                    {#each $datatypes as datatype}
+                                                                        <option
+                                                                            value={datatype._id}
+                                                                        >
+                                                                            {datatype.type}
+                                                                        </option>
+                                                                    {/each}
+                                                                </select></td
+                                                            >
+                                                            <td
+                                                                class="bg-gray-200"
+                                                                ><input
+                                                                    class="px-2 border-gray-200"
+                                                                    type="text"
+                                                                    bind:value={newField.description}
+                                                                    placeholder="Field description"
+                                                                /></td
+                                                            >
+                                                            <td
+                                                                class="text-center bg-gray-200"
+                                                                ><button
+                                                                    on:click={addField}
+                                                                    ><Fa
+                                                                        class="text-green-800"
+                                                                        icon={faPlus}
+                                                                    /></button
+                                                                ></td
+                                                            >
+                                                        </tr></tbody
+                                                    >
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
