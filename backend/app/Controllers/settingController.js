@@ -3,11 +3,13 @@ const { pool } = db
 const userController = require('../Controllers/userController')
 const { userControl } = userController
 
+
+/** tablelist **/
 const getTables = async (req, res) => {
     await userControl(req, res)
     const {
         rows
-    } = await pool.query('SELECT * FROM tablelist;');
+    } = await pool.query('SELECT _id, tablename as tablename, tablename as originalname, is_technical FROM tablelist;');
     res.send(rows);
 };
 
@@ -23,6 +25,21 @@ const postTable = async (req, res) => {
     res.json(rows);
 };
 
+const updateTable = async (req, res) => {
+    await userControl(req, res)
+    const {
+        tablename,
+        originalname
+    } = req.body;
+    if (tablename != originalname) {
+        // Table name changed
+        await pool.query('UPDATE tablelist SET tablename = $1 WHERE _id = $2;', [tablename, req.params.id]);
+        await pool.query(`ALTER TABLE ${originalname} RENAME TO ${tablename};`);
+    }
+
+    res.json({ message: 'Data has been updated !' });
+};
+
 const deleteTable = async (req, res) => {
     await userControl(req, res)
     await pool.query(`DROP TABLE IF EXISTS ${req.params.name};`)
@@ -31,9 +48,19 @@ const deleteTable = async (req, res) => {
     } = await pool.query('DELETE FROM tablelist WHERE _id = $1;', [req.params.id]);
     res.json(rows);
 };
+/** datatype **/
+const getDatatypes = async (req, res) => {
+    await userControl(req, res)
+    const {
+        rows
+    } = await pool.query('SELECT * FROM datatype;');
+    res.send(rows);
+};
 
 module.exports = {
     getTables,
     postTable,
-    deleteTable
+    deleteTable,
+    updateTable,
+    getDatatypes,
 };
