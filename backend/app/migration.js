@@ -69,6 +69,23 @@ exports.postgresMigration = async function createTable() {
                     ('softwareuser_user_role', TRUE),
                     ('books', FALSE),
                     ('blacklistedtoken', TRUE);`,
+                  `CREATE TABLE IF NOT EXISTS datatype (
+                      _id SERIAL PRIMARY KEY,
+                      type VARCHAR(255) NOT NULL,
+                      define_length BOOLEAN,
+                      default_length INT,
+                      max_length INT,
+                      define_precision BOOLEAN,
+                      default_precision INT,
+                      max_precision INT,
+                      description VARCHAR(255));`,
+                  `INSERT INTO datatype(type, define_length, default_length, max_length, define_precision, default_precision, max_precision, description) VALUES
+                      ('boolean', FALSE, 0, 0, FALSE, 0, 0, 'Logical Boolean (true/false)'),
+                      ('varchar', TRUE, 255, 10485760, FALSE, 0, 0, 'Variable-length character string'),
+                      ('date', FALSE, 0, 0, FALSE, 0, 0, 'Calendar date (year, month, day)'),
+                      ('integer', FALSE, 0, 0, FALSE, 0, 0, 'Signed four-byte integer (between -2147483648 and +2147483647)'),
+                      ('numeric', TRUE, 30, 131072, FALSE, 10, 16383, 'Signed decimal/numeric with max precision up to 131072 digits before the decimal point; up to 16383 digits after the decimal poin'),
+                      ('timestamp', FALSE, 0, 0, FALSE, 0, 0, 'Date and time (no time zone) (Between 4713 BC and 294276 AD)');`,
                 ]
                 if (instructions.length > version) {
                   let currentVersion = instructions.length

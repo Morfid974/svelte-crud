@@ -11,7 +11,7 @@ export const books: Writable<Book[]> = writable([])
 
 // Query
 export const queryTables = async () => {
-    axios.get("/backend/settings/tables", { withCredentials: true }).then((res) => tables.set(res.data as Table[]));
+    await axios.get("/backend/settings/tables", { withCredentials: true }).then((res) => tables.set(res.data as Table[]));
 }
 export const queryBooks = async () => {
     axios.get("/backend/books").then((res) => {

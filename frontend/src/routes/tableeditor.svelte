@@ -35,20 +35,26 @@
         };
     }
 
-    function addTable() {
+    async function addTable() {
+        let tableName: string = addTableForm.tablename;
         const payload = {
-            tablename: addTableForm.tablename,
+            tablename: tableName,
         };
         const path = "/backend/settings/tables";
-        axios
+        await axios
             .post(path, payload)
-            .then(() => {
-                getTables();
+            .then(async () => {
+                await getTables();
+                let newTable: Table = await $tables.find(
+                    (table) => table.tablename == tableName
+                );
+                editTable(newTable);
             })
             .catch((error) => {
                 console.log(error);
                 getTables();
             });
+
         addtoggle();
     }
     function updateTable() {
@@ -65,10 +71,10 @@
     }
     function editTable(table) {
         updatetoggle();
-        editTableForm = table.table;
+        editTableForm = table;
     }
     function removeTable(table) {
-        const path = `/backend/settings/tables/${table.table._id}/${table.table.tablename}`;
+        const path = `/backend/settings/tables/${table._id}/${table.tablename}`;
         axios
             .delete(path)
             .then(() => {
@@ -144,13 +150,13 @@
                                             <button
                                                 class="border border-yellow-500 bg-yellow-500 text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-yellow-600 focus:outline-none focus:shadow-outline"
                                                 on:click={() =>
-                                                    editTable({ table })}
+                                                    editTable(table)}
                                                 >Update</button
                                             >
                                             <button
                                                 class="border border-red-500 bg-red-500 text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-red-600 focus:outline-none focus:shadow-outline"
                                                 on:click={() =>
-                                                    removeTable({ table })}
+                                                    removeTable(table)}
                                                 >Delete</button
                                             >
                                         {/if}
