@@ -30,3 +30,13 @@ export const queryBooks = async () => {
 export const updateUser = ({ userInformation }) => {
     user.set(userInformation as User)
 }
+
+export const addTableField = ({ table, field }) => {
+    tables.update(tables => {
+        let tIdx = tables.findIndex((t) => t._id === table._id)
+        if (tIdx === -1) return tables
+        table.fields.push(field)
+        tables[tIdx] = table
+        return tables
+    })
+}

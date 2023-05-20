@@ -9,7 +9,24 @@ const getTables = async (req, res) => {
     await userControl(req, res)
     const {
         rows
-    } = await pool.query('SELECT _id, tablename as tablename, tablename as originalname, is_technical FROM tablelist;');
+    } = await pool.query(`
+    SELECT 
+        _id,
+        tablename as tablename,
+        tablename as originalname,
+        is_technical,
+        ${nestQuery(`
+            SELECT
+                fieldlist._id,
+                fieldlist.datatype_id,
+                fieldlist.tablelist_id,
+                fieldlist.length,
+                fieldlist.precision,
+                fieldlist.description
+            FROM fieldlist
+            WHERE fieldlist.tablelist_id = tablelist._id
+        `)} AS fields
+    FROM tablelist;`);
     res.send(rows);
 };
 
@@ -26,6 +43,7 @@ const postTable = async (req, res) => {
 };
 
 const updateTable = async (req, res) => {
+    // TODO: Update fields
     await userControl(req, res)
     const {
         tablename,
@@ -56,6 +74,19 @@ const getDatatypes = async (req, res) => {
     } = await pool.query('SELECT * FROM datatype;');
     res.send(rows);
 };
+
+/** helpers **/
+function nestQuery(query) {
+    return `
+      coalesce(
+        (
+          SELECT array_to_json(array_agg(row_to_json(x)))
+          FROM (${query}) x
+        ),
+        '[]'
+      )
+    `;
+}
 
 module.exports = {
     getTables,

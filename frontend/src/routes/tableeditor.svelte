@@ -6,6 +6,7 @@
         queryDataTypes,
         tables,
         datatypes,
+        addTableField,
     } from "../store/store";
     import { onMount } from "svelte";
     import { fly, fade } from "svelte/transition";
@@ -21,12 +22,9 @@
 
     let addTableForm: Table = {
         tablename: "",
+        fields: [],
     };
-    let editTableForm: Table = {
-        _id: null,
-        originalname: "",
-        tablename: "",
-    };
+    let editTableForm: Table = null;
     let addopen = false;
     let updateopen = false;
     let newField: Field = {
@@ -48,15 +46,35 @@
     });
 
     function onChangeFieldType(event) {
-        console.log(event);
+        newField.type = parseInt(event.target.value);
     }
 
     async function getTables() {
         await queryTables();
     }
+    function deleteField() {
+        // TODO: on deleteField
+        console.log("deleteField");
+    }
     function initForm() {
         addTableForm = {
             tablename: "",
+            fields: [],
+        };
+    }
+
+    function initField() {
+        newField = {
+            _id: null,
+            name: "",
+            type: null,
+            define_length: null,
+            default_length: null,
+            max_length: null,
+            define_precision: null,
+            default_precision: null,
+            max_precision: null,
+            description: null,
         };
     }
 
@@ -124,9 +142,12 @@
                 getTables();
             });
     }
-    function addField() {
-        //TODO: addField
-        console.log("on addField");
+    async function addField() {
+        await addTableField({ table: editTableForm, field: newField });
+        editTableForm = $tables.find(
+            (table) => table._id === editTableForm._id
+        );
+        initField();
     }
 </script>
 
@@ -383,7 +404,49 @@
                                                         >
                                                     </thead>
                                                     <tbody class="bg-gray-200">
-                                                        <!--TODO: Load existing fields -->
+                                                        {#each editTableForm.fields as field}
+                                                            <tr>
+                                                                <td
+                                                                    class="bg-gray-200"
+                                                                    ><span
+                                                                        class="px-2 border-gray-200"
+                                                                        >{field.name}</span
+                                                                    ></td
+                                                                >
+                                                                <td
+                                                                    class="bg-gray-200"
+                                                                >
+                                                                    <span
+                                                                        class="px-2 border-gray-200"
+                                                                        >{$datatypes.find(
+                                                                            (
+                                                                                datatype
+                                                                            ) =>
+                                                                                datatype._id ==
+                                                                                field.type
+                                                                        )
+                                                                            .type}</span
+                                                                    >
+                                                                </td>
+                                                                <td
+                                                                    class="bg-gray-200"
+                                                                    ><span
+                                                                        class="px-2 border-gray-200"
+                                                                        >{field.description}</span
+                                                                    ></td
+                                                                >
+                                                                <td
+                                                                    class="text-center bg-gray-200"
+                                                                    ><button
+                                                                        on:click={deleteField}
+                                                                        ><Fa
+                                                                            class="text-red-800"
+                                                                            icon={faTimes}
+                                                                        /></button
+                                                                    ></td
+                                                                >
+                                                            </tr>
+                                                        {/each}
                                                         <tr>
                                                             <td
                                                                 class="bg-gray-200"
@@ -398,7 +461,7 @@
                                                                 class="bg-gray-200"
                                                                 ><select
                                                                     class="px-2 border-gray-200"
-                                                                    value={newField.type}
+                                                                    bind:value={newField.type}
                                                                     on:change={(
                                                                         $event
                                                                     ) =>
