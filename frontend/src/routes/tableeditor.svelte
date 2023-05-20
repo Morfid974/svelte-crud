@@ -7,6 +7,7 @@
         tables,
         datatypes,
         addTableField,
+        removeTableField,
     } from "../store/store";
     import { onMount } from "svelte";
     import { fly, fade } from "svelte/transition";
@@ -52,9 +53,11 @@
     async function getTables() {
         await queryTables();
     }
-    function deleteField() {
-        // TODO: on deleteField
-        console.log("deleteField");
+    function deleteField({ field }) {
+        removeTableField({ table: editTableForm, field });
+        editTableForm = $tables.find(
+            (table) => table._id === editTableForm._id
+        );
     }
     function initForm() {
         addTableForm = {
@@ -438,7 +441,12 @@
                                                                 <td
                                                                     class="text-center bg-gray-200"
                                                                     ><button
-                                                                        on:click={deleteField}
+                                                                        on:click={() =>
+                                                                            deleteField(
+                                                                                {
+                                                                                    field,
+                                                                                }
+                                                                            )}
                                                                         ><Fa
                                                                             class="text-red-800"
                                                                             icon={faTimes}

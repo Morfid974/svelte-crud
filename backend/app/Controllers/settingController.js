@@ -43,7 +43,7 @@ const postTable = async (req, res) => {
 };
 
 const updateTable = async (req, res) => {
-    // TODO: Update fields
+    // TODO: Update fields (add & remove)
     await userControl(req, res)
     const {
         tablename,
