@@ -350,17 +350,51 @@
                                                     class="block text-sm font-bold ml-1 mb-2 text-gray-900 dark:text-white"
                                                     >{genericField.name}</label
                                                 >
-                                                <div class="relative">
+
+                                                {#if $datatypes.find((datatype) => datatype._id == genericField.datatype_id).type == "integer"}
                                                     <input
+                                                        type="number"
+                                                        step="1"
                                                         bind:value={editForm[
                                                             genericField.name
                                                         ]}
-                                                        id="edittitle"
-                                                        type="text"
-                                                        class="py-3 px-4 block w-full border-2 border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 shadow-sm"
                                                         placeholder={genericField.description}
                                                     />
-                                                </div>
+                                                {:else if $datatypes.find((datatype) => datatype._id == genericField.datatype_id).type == "numeric"}
+                                                    <input
+                                                        type="number"
+                                                        step={`0.${"0".repeat(
+                                                            genericField.precision
+                                                        )}1`}
+                                                        bind:value={editForm[
+                                                            genericField.name
+                                                        ]}
+                                                        placeholder={genericField.description}
+                                                    />
+                                                {:else if ["timestamp", "date"].includes($datatypes.find((datatype) => datatype._id == genericField.datatype_id).type)}
+                                                    <!--FIXME: cannot load data -->
+                                                    <DateInput
+                                                        bind:value={editForm[
+                                                            genericField.name
+                                                        ]}
+                                                        closeOnSelection={true}
+                                                    />
+                                                {:else if $datatypes.find((datatype) => datatype._id == genericField.datatype_id).type == "boolean"}
+                                                    <input
+                                                        type="checkbox"
+                                                        bind:checked={editForm[
+                                                            genericField.name
+                                                        ]}
+                                                    />
+                                                {:else}
+                                                    <input
+                                                        type="text"
+                                                        bind:value={editForm[
+                                                            genericField.name
+                                                        ]}
+                                                        placeholder={genericField.description}
+                                                    />
+                                                {/if}
                                             </div>
                                         </div>
                                     {/each}

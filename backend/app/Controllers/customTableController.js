@@ -13,12 +13,9 @@ const getData = async (req, res) => {
 
 const postData = async (req, res) => {
     await userControl(req, res)
-    console.log(req.body);
-    console.log(Object.keys(req.body).join(","));
     const values = Object.values(req.body)
         .map(val => typeof val === "string" ? `'${val}'` : val)
         .join(", ");
-    console.log(values)
 
     const {
         rows
@@ -28,11 +25,21 @@ const postData = async (req, res) => {
 
 const updateData = async (req, res) => {
     await userControl(req, res)
-    //TODO: update
+
+    let id = req.body._id
+    delete req.body._id
     console.log(req.body);
+    let update = ''
+    Object.keys(req.body)
+        .map(key => typeof req.body[key] === "string" ? update += `${key} = '${req.body[key]}', ` : update += `${key} = ${req.body[key]}`)
+        .join(", ");
+    console.log('update')
+    console.log(update)
+
     const {
         rows
-    } = await pool.query(`SELECT * FROM ${req.params.name};`);
+    } = await pool.query(`UPDATE ${req.params.name} SET ${update.slice(0, -2)} WHERE _id = ${id};`);
+
     res.send(rows);
 };
 const deleteData = async (req, res) => {
