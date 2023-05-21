@@ -115,9 +115,9 @@ exports.postgresMigration = async function createTable() {
                   `INSERT INTO tablelist(tablename, is_technical) VALUES
                               ('books', FALSE);`,
                   `INSERT INTO fieldlist(datatype_id, tablelist_id, length, precision, name, description) VALUES
-                              (1, 10, 255, 0, 'title', 'book title'),
-                              (1, 10, 255, 0, 'author', 'book author'),
-                              (1, 10, 255, 0, 'description', 'book description');`,
+                              (2, 10, 255, 0, 'title', 'book title'),
+                              (2, 10, 255, 0, 'author', 'book author'),
+                              (2, 10, 255, 0, 'description', 'book description');`,
                   `INSERT INTO menu(name, sequence, action, tablelist_id, description) VALUES
                     ('Books', 10, 'list', 10, 'Books list');`,
                 ]
