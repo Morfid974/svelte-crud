@@ -4,7 +4,7 @@
     import NavBar from "../components/NavBar.svelte";
     import Fa from "svelte-fa";
     import { faWrench, faPlus } from "@fortawesome/free-solid-svg-icons";
-    import { DateInput } from "date-picker-svelte";
+    import SveltyPicker from "svelty-picker";
     import {
         queryGenericData,
         genericData,
@@ -156,6 +156,7 @@
                                     class="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100"
                                 >
                                     {#each $genericFields as genericField}
+                                        <!--TODO: manage date & timestamp-->
                                         <td
                                             class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
                                             >{element[genericField.name]}</td
@@ -249,13 +250,23 @@
                                                     ]}
                                                     placeholder={genericField.description}
                                                 />
-                                            {:else if ["timestamp", "date"].includes($datatypes.find((datatype) => datatype._id == genericField.datatype_id).type)}
-                                                <!--FIXME: z-index avoid whole calendar -->
-                                                <DateInput
+                                            {:else if $datatypes.find((datatype) => datatype._id == genericField.datatype_id).type == "timestamp"}
+                                                <!-- FIXME: Time not saved -->
+                                                <SveltyPicker
                                                     bind:value={addElementForm[
                                                         genericField.name
                                                     ]}
-                                                    closeOnSelection={true}
+                                                    mode="datetime"
+                                                    pickerOnly={true}
+                                                />
+                                            {:else if $datatypes.find((datatype) => datatype._id == genericField.datatype_id).type == "date"}
+                                                <SveltyPicker
+                                                    bind:value={addElementForm[
+                                                        genericField.name
+                                                    ]}
+                                                    mode="date"
+                                                    pickerOnly={true}
+                                                    format="yyyy-mm-dd hh:ii:ss"
                                                 />
                                             {:else if $datatypes.find((datatype) => datatype._id == genericField.datatype_id).type == "boolean"}
                                                 <input
@@ -371,13 +382,30 @@
                                                         ]}
                                                         placeholder={genericField.description}
                                                     />
-                                                {:else if ["timestamp", "date"].includes($datatypes.find((datatype) => datatype._id == genericField.datatype_id).type)}
-                                                    <!--FIXME: cannot load data -->
-                                                    <DateInput
+                                                {:else if $datatypes.find((datatype) => datatype._id == genericField.datatype_id).type == "timestamp"}
+                                                    <!-- FIXME: Time not saved -->
+                                                    <!-- FIXME: Initial datetime not set -->
+                                                    <SveltyPicker
                                                         bind:value={editForm[
                                                             genericField.name
                                                         ]}
-                                                        closeOnSelection={true}
+                                                        initialDate={editForm[
+                                                            genericField.name
+                                                        ]}
+                                                        mode="datetime"
+                                                        pickerOnly={true}
+                                                    />
+                                                {:else if $datatypes.find((datatype) => datatype._id == genericField.datatype_id).type == "date"}
+                                                    <!-- FIXME: Initial date not set -->
+                                                    <SveltyPicker
+                                                        bind:value={editForm[
+                                                            genericField.name
+                                                        ]}
+                                                        initialDate={editForm[
+                                                            genericField.name
+                                                        ]}
+                                                        mode="date"
+                                                        pickerOnly={true}
                                                     />
                                                 {:else if $datatypes.find((datatype) => datatype._id == genericField.datatype_id).type == "boolean"}
                                                     <input

@@ -3,15 +3,13 @@
 	import { wrap } from "svelte-spa-router/wrap";
 	import Router from "svelte-spa-router";
 	import Home from "./routes/home.svelte";
-	import Generic from "./routes/generic.svelte";
 	import Login from "./routes/login.svelte";
 	import LogOut from "./routes/logout.svelte";
 	import NotFound from "./routes/404.svelte";
 	import { push } from "svelte-spa-router";
 	import { onMount } from "svelte";
-	import { updateUser, queryTables, tables } from "./store/store";
+	import { updateUser } from "./store/store";
 
-	import { Table } from "./models/table";
 	let routes = new Map();
 	routes.set("/", Home);
 	routes.set(

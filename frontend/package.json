@@ -12,9 +12,6 @@
     "@sveltejs/vite-plugin-svelte": "^2.0.3",
     "@tsconfig/svelte": "^3.0.0",
     "date-fns": "^2.29.3",
-    "date-picker-svelte": "^2.3.0",
-    "luxon": "^3.3.0",
-    "stores-x": "^0.0.872",
     "svelte": "^3.59.0",
     "svelte-check": "^2.10.3",
     "svelte-select": "^5.6.0",
@@ -30,6 +27,7 @@
     "svelte-fa": "^3.0.3",
     "svelte-spa-router": "^3.3.0",
     "svelte-transition": "^0.0.7",
+    "svelty-picker": "^3.5.0",
     "tailwindcss": "^3.3.2"
   }
 }
