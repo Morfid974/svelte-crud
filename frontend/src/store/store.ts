@@ -43,12 +43,15 @@ export const addTableField = ({ table, field }) => {
 
 export const removeTableField = async ({ table, field }) => {
     tables.update(tables => {
-      let tIdx = tables.findIndex((t) => t._id === table._id);
-      if (tIdx === -1) { return tables }
-      let fIdx = tables[tIdx].fields
-        .findIndex((fielddata) => fielddata == field)
-      tables[tIdx].fields
-        .splice(fIdx, 1)
-      return tables
+        let tIdx = tables.findIndex((t) => t._id === table._id);
+        if (tIdx === -1) { return tables }
+        let fIdx = tables[tIdx].fields
+            .findIndex((fielddata) => fielddata == field)
+        tables[tIdx].fields
+            .splice(fIdx, 1)
+        if (field._id !== null) {
+            tables[tIdx].removedFields.push(field)
+        }
+        return tables
     })
-  }
+}

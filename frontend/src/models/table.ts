@@ -6,4 +6,6 @@ export class Table {
     tablename: string
     is_technical?: boolean
     fields: Field[]
+    updatedFields?: Field[]
+    removedFields?: Field[]
 }

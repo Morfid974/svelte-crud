@@ -190,8 +190,7 @@ const checkToken = async (req, res) => {
                     return true
                 } else { res.status(401).send({ message: "Token blacklisted!" }) }
             })
-        }
-        if (await tokenNotInBlackList(access_token)) {
+        } else if (await tokenNotInBlackList(access_token)) {
             const login = claims.login
             const data = await pool.query(`SELECT name, login FROM softwareuser WHERE login= $1;`, [login])
             const user = data.rows;

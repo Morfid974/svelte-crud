@@ -84,7 +84,7 @@ exports.postgresMigration = async function createTable() {
                       ('varchar', TRUE, 255, 10485760, FALSE, 0, 0, 'Variable-length character string'),
                       ('date', FALSE, 0, 0, FALSE, 0, 0, 'Calendar date (year, month, day)'),
                       ('integer', FALSE, 0, 0, FALSE, 0, 0, 'Signed four-byte integer (between -2147483648 and +2147483647)'),
-                      ('numeric', TRUE, 30, 131072, FALSE, 10, 16383, 'Signed decimal/numeric with max precision up to 131072 digits before the decimal point; up to 16383 digits after the decimal poin'),
+                      ('numeric', TRUE, 30, 131072, TRUE, 10, 16383, 'Signed decimal/numeric with max precision up to 131072 digits before the decimal point; up to 16383 digits after the decimal poin'),
                       ('timestamp', FALSE, 0, 0, FALSE, 0, 0, 'Date and time (no time zone) (Between 4713 BC and 294276 AD)');`,
                   `CREATE TABLE IF NOT EXISTS fieldlist (
                         _id SERIAL PRIMARY KEY,
@@ -92,6 +92,7 @@ exports.postgresMigration = async function createTable() {
                         tablelist_id INT NOT NULL REFERENCES tablelist,
                         length INT,
                         precision INT,
+                        name VARCHAR(255),
                         description VARCHAR(255));`,
                 ]
                 if (instructions.length > version) {

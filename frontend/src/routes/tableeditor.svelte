@@ -20,6 +20,7 @@
         faWrench,
     } from "@fortawesome/free-solid-svg-icons";
     import type { Field } from "src/models/field";
+    import type { DataType } from "src/models/datatype";
 
     let addTableForm: Table = {
         tablename: "",
@@ -31,13 +32,16 @@
     let newField: Field = {
         _id: null,
         name: "",
-        type: null,
+        datatype_id: null,
+        datatypeName: "",
         define_length: null,
         default_length: null,
         max_length: null,
+        length: null,
         define_precision: null,
         default_precision: null,
         max_precision: null,
+        precision: null,
         description: null,
     };
 
@@ -47,7 +51,19 @@
     });
 
     function onChangeFieldType(event) {
-        newField.type = parseInt(event.target.value);
+        newField.datatype_id = parseInt(event.target.value);
+        let fieldType: DataType = $datatypes.find(
+            (datatype) => datatype._id === parseInt(event.target.value)
+        );
+        newField.default_length = fieldType.default_length;
+        newField.default_precision = fieldType.default_precision;
+        newField.define_length = fieldType.define_length;
+        newField.define_precision = fieldType.define_precision;
+        newField.length = fieldType.default_length;
+        newField.max_length = fieldType.max_precision;
+        newField.max_precision = fieldType.max_precision;
+        newField.precision = fieldType.default_precision;
+        newField.datatypeName = fieldType.type;
     }
 
     async function getTables() {
@@ -70,13 +86,16 @@
         newField = {
             _id: null,
             name: "",
-            type: null,
+            datatype_id: null,
+            datatypeName: "",
             define_length: null,
             default_length: null,
             max_length: null,
+            length: null,
             define_precision: null,
             default_precision: null,
             max_precision: null,
+            precision: null,
             description: null,
         };
     }
@@ -107,6 +126,13 @@
         const payload = {
             tablename: editTableForm.tablename,
             originalname: editTableForm.originalname,
+            fields: editTableForm.fields,
+            removedField: editTableForm.removedFields
+                ? editTableForm.removedFields
+                : [],
+            updatedField: editTableForm.updatedFields
+                ? editTableForm.updatedFields
+                : [],
         };
         const path = `/backend/settings/tables/${editTableForm._id}`;
         await axios
@@ -146,6 +172,8 @@
             });
     }
     async function addField() {
+        //TODO: Control duplicate field name before
+        //TODO: Control input correct (has name, desc, precision & length not null if has define true)
         await addTableField({ table: editTableForm, field: newField });
         editTableForm = $tables.find(
             (table) => table._id === editTableForm._id
@@ -402,6 +430,18 @@
                                                             <th
                                                                 scope="col"
                                                                 class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                                                            >
+                                                                Length
+                                                            </th>
+                                                            <th
+                                                                scope="col"
+                                                                class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                                                            >
+                                                                Precision
+                                                            </th>
+                                                            <th
+                                                                scope="col"
+                                                                class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
                                                                 >Action</th
                                                             ></tr
                                                         >
@@ -426,7 +466,7 @@
                                                                                 datatype
                                                                             ) =>
                                                                                 datatype._id ==
-                                                                                field.type
+                                                                                field.datatype_id
                                                                         )
                                                                             .type}</span
                                                                     >
@@ -438,6 +478,26 @@
                                                                         >{field.description}</span
                                                                     ></td
                                                                 >
+                                                                <td
+                                                                    class="bg-gray-200"
+                                                                >
+                                                                    {#if $datatypes.find((datatype) => datatype._id == field.datatype_id).define_length}
+                                                                        <span
+                                                                            class="px-2 border-gray-200"
+                                                                            >{field.length}</span
+                                                                        >
+                                                                    {/if}
+                                                                </td>
+                                                                <td
+                                                                    class="bg-gray-200"
+                                                                >
+                                                                    {#if $datatypes.find((datatype) => datatype._id == field.datatype_id).define_precision}
+                                                                        <span
+                                                                            class="px-2 border-gray-200"
+                                                                            >{field.precision}</span
+                                                                        >
+                                                                    {/if}
+                                                                </td>
                                                                 <td
                                                                     class="text-center bg-gray-200"
                                                                     ><button
@@ -455,6 +515,7 @@
                                                                 >
                                                             </tr>
                                                         {/each}
+                                                        <!-- TODO: choose length & precision if needed, add relational field -->
                                                         <tr>
                                                             <td
                                                                 class="bg-gray-200"
@@ -469,7 +530,7 @@
                                                                 class="bg-gray-200"
                                                                 ><select
                                                                     class="px-2 border-gray-200"
-                                                                    bind:value={newField.type}
+                                                                    bind:value={newField.datatype_id}
                                                                     on:change={(
                                                                         $event
                                                                     ) =>
@@ -495,6 +556,30 @@
                                                                     placeholder="Field description"
                                                                 /></td
                                                             >
+                                                            <td
+                                                                class="bg-gray-200"
+                                                            >
+                                                                {#if newField.define_length}
+                                                                    <input
+                                                                        class="px-2 border-gray-200"
+                                                                        type="numeric"
+                                                                        bind:value={newField.length}
+                                                                        placeholder="Field description"
+                                                                    />
+                                                                {/if}
+                                                            </td>
+                                                            <td
+                                                                class="bg-gray-200"
+                                                            >
+                                                                {#if newField.define_precision}
+                                                                    <input
+                                                                        class="px-2 border-gray-200"
+                                                                        type="numeric"
+                                                                        bind:value={newField.precision}
+                                                                        placeholder="Field description"
+                                                                    />
+                                                                {/if}
+                                                            </td>
                                                             <td
                                                                 class="text-center bg-gray-200"
                                                                 ><button
