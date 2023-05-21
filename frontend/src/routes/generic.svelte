@@ -1,7 +1,6 @@
 <script lang="ts">
     import axios from "axios";
-
-    import { onMount } from "svelte";
+    import { fly, fade } from "svelte/transition";
     import NavBar from "../components/NavBar.svelte";
     import Transition from "svelte-transition";
     import Fa from "svelte-fa";
@@ -17,101 +16,82 @@
     import { location } from "svelte-spa-router";
     import type { Table } from "src/models/table";
 
-    /*
-    let addBookForm: Book = {
-        title: "",
-        author: "",
-        description: "",
-    };
-    let editForm: Book = {
-        _id: null,
-        title: "",
-        author: "",
-        description: "",
-    };
-    */
+    let addElementForm = new Map();
+    for (let field of $genericFields) {
+        addElementForm.set(field.name, "");
+    }
+
+    let editForm = new Map();
+    for (let field of $genericFields) {
+        editForm.set(field.name, "");
+    }
 
     async function getGeneric(table: Table) {
         await queryGenericData({ tableName: table.tablename });
         await queryGenericFields({ tableName: table.tablename });
         console.log($genericFields);
     }
-    /*
-    function removeBook(bookID) {
-        const path = `/backend/books/${bookID.book._id}`;
+
+    function removeElement(elementID) {
+        const path = `/backend/generic/${$location.split("/")[2]}/${elementID}`;
         axios
             .delete(path)
             .then(() => {
-                getBooks();
+                getCustomTableData($location);
             })
             .catch((error) => {
                 console.error(error);
-                getBooks();
+                getCustomTableData($location);
             });
     }
-    */
-    /*
+
     function initForm() {
-        addBookForm = {
-            title: "",
-            author: "",
-            description: "",
-        };
-        editForm = {
-            _id: null,
-            title: "",
-            author: "",
-            description: "",
-        };
+        addElementForm = new Map();
+        for (let field of $genericFields) {
+            addElementForm.set(field.name, "");
+        }
+
+        editForm = new Map();
+        for (let field of $genericFields) {
+            editForm.set(field.name, "");
+        }
     }
-    */
-    /*
-    function addBook() {
-        const payload = {
-            title: addBookForm.title,
-            author: addBookForm.author,
-            description: addBookForm.description,
-        };
-        const path = "/backend/books";
+
+    function addElement() {
+        const path = `/backend/generic/${$location.split("/")[2]}`;
         axios
-            .post(path, payload)
+            .post(path, addElementForm)
             .then(() => {
-                getBooks();
+                getCustomTableData($location);
             })
             .catch((error) => {
                 console.log(error);
-                getBooks();
+                getCustomTableData($location);
             });
         addtoggle();
     }
-    */
-    /*
-    function editBook(book) {
-        updatetoggle();
-        editForm = book.book;
-    }
-    */
 
-    /*
-    function updateBook() {
-        const payload = {
-            title: editForm.title,
-            author: editForm.author,
-            description: editForm.description,
-        };
-        const path = `/backend/books/${editForm._id}`;
+    function editElement(element) {
+        updatetoggle();
+        editForm = element;
+    }
+
+    function updateElement() {
+        const path = `/backend/generic/${$location.split("/")[2]}/${
+            editForm["_id"]
+        }`;
         axios
-            .put(path, payload)
+            .put(path, editForm)
             .then(() => {
-                getBooks();
+                getCustomTableData($location);
             })
             .catch((error) => {
                 console.error(error);
-                getBooks();
+                getCustomTableData($location);
             });
         updatetoggle();
     }
-    */
+
     $: getCustomTableData($location);
     async function getCustomTableData(location) {
         await queryTables();
@@ -123,21 +103,20 @@
         }
     }
 
-    //let addopen = false;
+    let addopen = false;
 
     function addtoggle() {
         console.log("on add toggle");
-        //initForm();
-        //addopen = !addopen;
+        initForm();
+        addopen = !addopen;
     }
 
-    //let updateopen = false;
-    /*
+    let updateopen = false;
+
     function updatetoggle() {
         initForm();
         updateopen = !updateopen;
     }
-    */
 </script>
 
 <NavBar />
@@ -184,17 +163,13 @@
                                         <button
                                             class="border border-yellow-500 bg-yellow-500 text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-yellow-600 focus:outline-none focus:shadow-outline"
                                             on:click={() => {
-                                                /*editBook({ book })*/ console.log(
-                                                    "onedit"
-                                                );
+                                                editElement(element);
                                             }}>Update</button
                                         >
                                         <button
                                             class="border border-red-500 bg-red-500 text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-red-600 focus:outline-none focus:shadow-outline"
                                             on:click={() => {
-                                                /*removeBook({ book })*/ console.log(
-                                                    "onremove"
-                                                );
+                                                removeElement(element);
                                             }}>Delete</button
                                         >
                                     </td>
@@ -206,16 +181,12 @@
             </div>
         </div>
     </div>
-    <!--
+
     {#if addopen}
-        <div
-            class="relative z-10"
-            aria-labelledby="modal-title"
-            role="dialog"
-            aria-modal="true"
-        >
+        <div class="relative z-10">
             <div
-                class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity ease-in-out duration-150"
+                transition:fade
             />
 
             <div class="fixed inset-0 z-10 overflow-y-auto">
@@ -224,6 +195,7 @@
                 >
                     <div
                         class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
+                        transition:fly
                     >
                         <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                             <div class="sm:flex sm:items-start">
@@ -248,27 +220,19 @@
                                         class="text-base font-semibold leading-6 text-gray-900"
                                         id="modal-title"
                                     >
-                                        Add a new book
+                                        Add a new {$location.split("/")[2]}
                                     </h3>
                                     <div class="mt-2">
-                                        <div>Title:</div>
-                                        <input
-                                            type="text"
-                                            bind:value={addBookForm.title}
-                                            placeholder="book title"
-                                        />
-                                        <div>Author:</div>
-                                        <input
-                                            type="text"
-                                            bind:value={addBookForm.author}
-                                            placeholder="book author"
-                                        />
-                                        <div>Description:</div>
-                                        <input
-                                            type="text"
-                                            bind:value={addBookForm.description}
-                                            placeholder="book description"
-                                        />
+                                        {#each $genericFields as genericField}
+                                            <div>{genericField.name}:</div>
+                                            <input
+                                                type="text"
+                                                bind:value={addElementForm[
+                                                    "genericField.name"
+                                                ]}
+                                                placeholder={genericField.description}
+                                            />
+                                        {/each}
                                     </div>
                                 </div>
                             </div>
@@ -277,7 +241,7 @@
                             class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
                         >
                             <button
-                                on:click={addBook}
+                                on:click={addElement}
                                 type="button"
                                 class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
                                 >Create</button
@@ -294,150 +258,93 @@
             </div>
         </div>
     {/if}
-    -->
-    <!--
-    {#if updateopen}
-        <div
-            class="relative z-10"
-            aria-labelledby="modal-title"
-            role="dialog"
-            aria-modal="true"
-        >
-            <Transition
-                show={updateopen}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0"
-                enterTo="opacity-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0"
-            >
-                <div
-                    class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-                />
 
-                <div class="fixed inset-0 z-10 overflow-y-auto">
+    {#if updateopen}
+        <div class="relative z-10">
+            <div
+                class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity ease-in-out duration-150"
+                transition:fade
+            />
+
+            <div class="fixed inset-0 z-10 overflow-y-auto">
+                <div
+                    class="min-w-full flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
+                >
                     <div
-                        class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
+                        class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full md:w-auto lg:w-auto"
+                        transition:fly
                     >
-                        <Transition
-                            show={updateopen}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0  translate-y-4 sm:translate-y-0 sm:scale-95"
-                            enterTo="opacity-100  translate-y-0 sm:scale-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100  translate-y-0 sm:scale-100"
-                            leaveTo="opacity-0  translate-y-4 sm:translate-y-0 sm:scale-95"
+                        <div
+                            class="bg-white dark:bg-gray-800 dark:border-gray-700 px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
                         >
-                            <div
-                                class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
-                            >
+                            <div class="sm:flex sm:items-start">
                                 <div
-                                    class="bg-white dark:bg-gray-800 dark:border-gray-700 px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
+                                    class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-orange-100 sm:mx-0 sm:h-10 sm:w-10"
                                 >
-                                    <div class="sm:flex sm:items-start">
-                                        <div
-                                            class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-orange-100 sm:mx-0 sm:h-10 sm:w-10"
-                                        >
-                                            <svg
-                                                class="h-6 w-6 text-orange-600"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke-width="1.5"
-                                                stroke="currentColor"
-                                                aria-hidden="true"
-                                            >
-                                                <Fa icon={faWrench} />
-                                            </svg>
-                                        </div>
-                                        <div
-                                            class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left"
-                                        >
-                                            <h3
-                                                class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
-                                                id="modal-title"
-                                            >
-                                                Update book
-                                            </h3>
-                                            <div class="grid gap-y-4">
-                                                <div>
-                                                    <label
-                                                        for="edittitle"
-                                                        class="block text-sm font-bold ml-1 mb-2 text-gray-900 dark:text-white"
-                                                        >Title</label
-                                                    >
-                                                    <div class="relative">
-                                                        <input
-                                                            bind:value={editForm.title}
-                                                            id="edittitle"
-                                                            type="text"
-                                                            class="py-3 px-4 block w-full border-2 border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 shadow-sm"
-                                                            placeholder="Book title"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="grid gap-y-4">
-                                                <div>
-                                                    <label
-                                                        for="editauthor"
-                                                        class="block text-sm font-bold ml-1 mb-2 text-gray-900 dark:text-white"
-                                                        >Author</label
-                                                    >
-                                                    <div class="relative">
-                                                        <input
-                                                            bind:value={editForm.author}
-                                                            id="editauthor"
-                                                            type="text"
-                                                            class="py-3 px-4 block w-full border-2 border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 shadow-sm"
-                                                            placeholder="Book title"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="grid gap-y-4">
-                                                <div>
-                                                    <label
-                                                        for="editdescription"
-                                                        class="block text-sm font-bold ml-1 mb-2 text-gray-900 dark:text-white"
-                                                        >Description</label
-                                                    >
-                                                    <div class="relative">
-                                                        <input
-                                                            bind:value={editForm.description}
-                                                            id="editdescription"
-                                                            type="text"
-                                                            class="py-3 px-4 block w-full border-2 border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 shadow-sm"
-                                                            placeholder="Book description"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <svg
+                                        class="h-6 w-6 text-orange-600"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="1.5"
+                                        stroke="currentColor"
+                                        aria-hidden="true"
+                                    >
+                                        <Fa icon={faWrench} />
+                                    </svg>
                                 </div>
                                 <div
-                                    class="bg-gray-50 dark:bg-gray-800 dark:border-gray-700 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
+                                    class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left"
                                 >
-                                    <button
-                                        on:click={updateBook}
-                                        type="button"
-                                        class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
-                                        >Update</button
+                                    <h3
+                                        class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
+                                        id="modal-title"
                                     >
-                                    <button
-                                        on:click={updatetoggle}
-                                        type="button"
-                                        class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                                        >Cancel</button
-                                    >
+                                        Update {$location.split("/")[2]}
+                                    </h3>
+                                    {#each $genericFields as genericField}
+                                        <div class="grid gap-y-4">
+                                            <div>
+                                                <label
+                                                    for="edittitle"
+                                                    class="block text-sm font-bold ml-1 mb-2 text-gray-900 dark:text-white"
+                                                    >{genericField.name}</label
+                                                >
+                                                <div class="relative">
+                                                    <input
+                                                        bind:value={editForm[
+                                                            genericField.name
+                                                        ]}
+                                                        id="edittitle"
+                                                        type="text"
+                                                        class="py-3 px-4 block w-full border-2 border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 shadow-sm"
+                                                        placeholder={genericField.description}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {/each}
                                 </div>
                             </div>
-                        </Transition>
+                        </div>
+                        <div
+                            class="bg-gray-50 dark:bg-gray-800 dark:border-gray-700 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
+                        >
+                            <button
+                                on:click={updateElement}
+                                type="button"
+                                class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
+                                >Update</button
+                            >
+                            <button
+                                on:click={updatetoggle}
+                                type="button"
+                                class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                                >Cancel</button
+                            >
+                        </div>
                     </div>
                 </div>
-            </Transition>
+            </div>
         </div>
     {/if}
-    -->
 </div>
