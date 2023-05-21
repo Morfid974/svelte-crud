@@ -2,9 +2,9 @@
     import axios from "axios";
     import { fly, fade } from "svelte/transition";
     import NavBar from "../components/NavBar.svelte";
-    import Transition from "svelte-transition";
     import Fa from "svelte-fa";
     import { faWrench, faPlus } from "@fortawesome/free-solid-svg-icons";
+    import { DateInput } from "date-picker-svelte";
     import {
         queryGenericData,
         genericData,
@@ -12,6 +12,8 @@
         tables,
         queryGenericFields,
         genericFields,
+        datatypes,
+        queryDataTypes,
     } from "../store/store";
     import { location } from "svelte-spa-router";
     import type { Table } from "src/models/table";
@@ -95,6 +97,7 @@
     $: getCustomTableData($location);
     async function getCustomTableData(location) {
         await queryTables();
+        await queryDataTypes();
         let table: Table = $tables.find(
             (table) => table.tablename === location.split("/")[2]
         );
@@ -225,13 +228,50 @@
                                     <div class="mt-2">
                                         {#each $genericFields as genericField}
                                             <div>{genericField.name}:</div>
-                                            <input
-                                                type="text"
-                                                bind:value={addElementForm[
-                                                    "genericField.name"
-                                                ]}
-                                                placeholder={genericField.description}
-                                            />
+                                            {#if $datatypes.find((datatype) => datatype._id == genericField.datatype_id).type == "integer"}
+                                                <input
+                                                    type="number"
+                                                    step="1"
+                                                    bind:value={addElementForm[
+                                                        genericField.name
+                                                    ]}
+                                                    placeholder={genericField.description}
+                                                />
+                                            {:else if $datatypes.find((datatype) => datatype._id == genericField.datatype_id).type == "numeric"}
+                                                <input
+                                                    type="number"
+                                                    step={`0.${"0".repeat(
+                                                        genericField.precision
+                                                    )}1`}
+                                                    bind:value={addElementForm[
+                                                        genericField.name
+                                                    ]}
+                                                    placeholder={genericField.description}
+                                                />
+                                            {:else if ["timestamp", "date"].includes($datatypes.find((datatype) => datatype._id == genericField.datatype_id).type)}
+                                                <!--FIXME: z-index avoid whole calendar -->
+                                                <DateInput
+                                                    bind:value={addElementForm[
+                                                        genericField.name
+                                                    ]}
+                                                    closeOnSelection={true}
+                                                />
+                                            {:else if $datatypes.find((datatype) => datatype._id == genericField.datatype_id).type == "boolean"}
+                                                <input
+                                                    type="checkbox"
+                                                    bind:checked={addElementForm[
+                                                        genericField.name
+                                                    ]}
+                                                />
+                                            {:else}
+                                                <input
+                                                    type="text"
+                                                    bind:value={addElementForm[
+                                                        genericField.name
+                                                    ]}
+                                                    placeholder={genericField.description}
+                                                />
+                                            {/if}
                                         {/each}
                                     </div>
                                 </div>
