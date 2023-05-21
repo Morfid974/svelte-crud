@@ -36,7 +36,7 @@ export const queryBooks = async () => {
 }
 
 export const queryGenericData = async ({ tableName }) => {
-    axios.get(`/backend/${tableName}`).then((res) => {
+    axios.get(`/backend/generic/${tableName}`).then((res) => {
         genericData.set(res.data);
     });
 }

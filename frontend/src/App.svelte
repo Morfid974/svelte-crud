@@ -22,7 +22,12 @@
 	);
 	routes.set("/login", Login);
 	routes.set("/logout", LogOut);
-	routes.set("/generic/*", Generic);
+	routes.set(
+		"/generic/*",
+		wrap({
+			asyncComponent: () => import("./routes/generic.svelte"),
+		})
+	);
 	routes.set(
 		"/settings/tables",
 		wrap({

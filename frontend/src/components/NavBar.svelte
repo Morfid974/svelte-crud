@@ -5,8 +5,13 @@
     import { user } from "../store/store";
     import Transition from "svelte-transition";
     import { location } from "svelte-spa-router";
+    import { onMount } from "svelte";
+    import { queryTables, tables } from "../store/store";
     let showUserMenu = false;
     let showSettings = false;
+    onMount(async () => {
+        await queryTables();
+    });
 </script>
 
 {#if $user}
@@ -22,12 +27,17 @@
                                     : 'text-gray-300 hover:bg-gray-700 hover:text-white'} rounded-md px-3 py-2 text-sm font-medium"
                                 to="/">Home</NavLink
                             >
-                            <NavLink
-                                classNames="{$location == '/books'
-                                    ? 'bg-gray-900 text-white'
-                                    : 'text-gray-300 hover:bg-gray-700 hover:text-white'} rounded-md px-3 py-2 text-sm font-medium"
-                                to="/books">Books</NavLink
-                            >
+                            <!-- TODO: Temp, change this when menu is op -->
+                            {#each $tables.filter((table) => !table.is_technical) as table}
+                                <NavLink
+                                    classNames="{$location ==
+                                    `/generic/${table.tablename}`
+                                        ? 'bg-gray-900 text-white'
+                                        : 'text-gray-300 hover:bg-gray-700 hover:text-white'} rounded-md px-3 py-2 text-sm font-medium"
+                                    to="/generic/{table.tablename}"
+                                    >{table.tablename}</NavLink
+                                >
+                            {/each}
                             <button
                                 on:click={() => (showSettings = !showSettings)}
                                 class="{showSettings ||

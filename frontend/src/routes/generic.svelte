@@ -112,16 +112,16 @@
         updatetoggle();
     }
     */
-
-    onMount(async () => {
+    $: getCustomTableData($location);
+    async function getCustomTableData(location) {
         await queryTables();
         let table: Table = $tables.find(
-            (table) => table.tablename === $location.split("/")[2]
+            (table) => table.tablename === location.split("/")[2]
         );
         if (table) {
             await getGeneric(table);
         }
-    });
+    }
 
     //let addopen = false;
 
