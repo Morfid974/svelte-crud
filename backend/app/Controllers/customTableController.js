@@ -39,7 +39,7 @@ const deleteData = async (req, res) => {
     await userControl(req, res)
     const {
         rows
-    } = await pool.query('DELETE FROM $1 WHERE _id = $2;', [req.params.name, req.params.id]);
+    } = await pool.query(`DELETE FROM ${req.params.name} WHERE _id = ${req.params.id};`);
     res.json(rows);
 };
 module.exports = {

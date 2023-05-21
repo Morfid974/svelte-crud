@@ -17,6 +17,7 @@
     } from "../store/store";
     import { location } from "svelte-spa-router";
     import type { Table } from "src/models/table";
+    import type { Field } from "src/models/field";
 
     let addElementForm = new Map();
     for (let field of $genericFields) {
@@ -31,11 +32,12 @@
     async function getGeneric(table: Table) {
         await queryGenericData({ tableName: table.tablename });
         await queryGenericFields({ tableName: table.tablename });
-        console.log($genericFields);
     }
 
-    function removeElement(elementID) {
-        const path = `/backend/generic/${$location.split("/")[2]}/${elementID}`;
+    function removeElement(element: Field) {
+        const path = `/backend/generic/${$location.split("/")[2]}/${
+            element._id
+        }`;
         axios
             .delete(path)
             .then(() => {
@@ -109,7 +111,6 @@
     let addopen = false;
 
     function addtoggle() {
-        console.log("on add toggle");
         initForm();
         addopen = !addopen;
     }
