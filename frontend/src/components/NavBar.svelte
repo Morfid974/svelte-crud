@@ -66,6 +66,16 @@
                                         to="/settings/tables"
                                         >Table editor
                                     </NavLink>
+                                    <NavLink
+                                        classNames="{$location ==
+                                        '/settings/menu'
+                                            ? 'bg-gray-700 text-white'
+                                            : 'text-gray-700'} block rounded-md px-4 py-2 mx-1 text-sm hover:bg-gray-700 hover:text-white"
+                                        role="menuitem"
+                                        id="user-menu-item-0"
+                                        to="/settings/menu"
+                                        >Menu
+                                    </NavLink>
                                 </div>
                             </Transition>
                         </div>

@@ -4,12 +4,17 @@ import { writable, type Writable } from 'svelte/store'
 import axios from "axios";
 import type { Book } from "src/models/book";
 import type { DataType } from "src/models/datatype";
+import type { Menu } from "src/models/menu";
+import type { Field } from "src/models/field";
 
 //**  Writable  **/
 export const user: Writable<User> = writable(null)
 export const tables: Writable<Table[]> = writable([])
 export const datatypes: Writable<DataType[]> = writable([])
+export const menu: Writable<Menu[]> = writable([])
 export const books: Writable<Book[]> = writable([])
+export const genericData: Writable<[]> = writable([])
+export const genericFields: Writable<Field[]> = writable([])
 
 //**  Query  **//
 export const queryTables = async () => {
@@ -20,10 +25,30 @@ export const queryDataTypes = async () => {
     await axios.get("/backend/settings/datatypes", { withCredentials: true }).then((res) => datatypes.set(res.data as DataType[]));
 }
 
+export const queryMenu = async () => {
+    await axios.get("/backend/settings/menu", { withCredentials: true }).then((res) => menu.set(res.data as Menu[]));
+}
+
 export const queryBooks = async () => {
     axios.get("/backend/books").then((res) => {
         books.set(res.data as Book[]);
     });
+}
+
+export const queryGenericData = async ({ tableName }) => {
+    axios.get(`/backend/${tableName}`).then((res) => {
+        genericData.set(res.data);
+    });
+}
+
+export const queryGenericFields = async ({ tableName }) => {
+    const path = `/backend/settings/fields/${tableName}`;
+    axios.get
+        (path)
+        .then((res) => {
+            genericFields.set(res.data as Field[]);
+        })
+
 }
 
 //**  Mutation  **//

@@ -48,14 +48,6 @@ exports.postgresMigration = async function createTable() {
                   , CONSTRAINT user_user_role_pkey PRIMARY KEY (user_id, user_role_id));`,
                   `INSERT INTO softwareuser_user_role(user_id, user_role_id) VALUES
                     (1, 1);`,
-                  `CREATE TABLE IF NOT EXISTS books (
-                    _id SERIAL PRIMARY KEY,
-                    title VARCHAR(255) NOT NULL,
-                    author VARCHAR(255) NOT NULL,
-                    description VARCHAR(255) NOT NULL);`,
-                  `TRUNCATE TABLE books;`,
-                  `INSERT INTO books(title, author, description) VALUES
-                    ('PostgreSQL 11', 'Simon Riggs', 'Administration cookbook');`,
                   `CREATE TABLE IF NOT EXISTS blacklistedtoken (
                       _id SERIAL PRIMARY KEY,
                       token VARCHAR(255) NOT NULL);`,
@@ -63,12 +55,6 @@ exports.postgresMigration = async function createTable() {
                         _id SERIAL PRIMARY KEY,
                         tablename VARCHAR(255) NOT NULL,
                         is_technical BOOLEAN);`,
-                  `INSERT INTO tablelist(tablename, is_technical) VALUES
-                    ('user_role', TRUE),
-                    ('softwareuser', TRUE),
-                    ('softwareuser_user_role', TRUE),
-                    ('books', FALSE),
-                    ('blacklistedtoken', TRUE);`,
                   `CREATE TABLE IF NOT EXISTS datatype (
                       _id SERIAL PRIMARY KEY,
                       type VARCHAR(255) NOT NULL,
@@ -94,6 +80,46 @@ exports.postgresMigration = async function createTable() {
                         precision INT,
                         name VARCHAR(255),
                         description VARCHAR(255));`,
+                  `CREATE TABLE IF NOT EXISTS menu (
+                          _id SERIAL PRIMARY KEY,
+                          sequence INT,
+                          name VARCHAR(255),
+                          action VARCHAR(255),
+                          tablelist_id INT REFERENCES tablelist,
+                          description VARCHAR(255));`,
+                  `CREATE TABLE IF NOT EXISTS submenu (
+                            _id SERIAL PRIMARY KEY,
+                            sequence INT,
+                            menu_id INT NOT NULL REFERENCES menu,
+                            name VARCHAR(255),
+                            action VARCHAR(255),
+                            tablelist_id INT REFERENCES tablelist,
+                            description VARCHAR(255));`,
+                  `INSERT INTO tablelist(tablename, is_technical) VALUES
+                    ('user_role', TRUE),
+                    ('softwareuser', TRUE),
+                    ('softwareuser_user_role', TRUE),
+                    ('blacklistedtoken', TRUE),
+                    ('tablelist', TRUE),
+                    ('datatype', TRUE),
+                    ('fieldlist', TRUE),
+                    ('menu', TRUE),
+                    ('submenu', TRUE);`,
+                  `CREATE TABLE IF NOT EXISTS books (
+                              _id SERIAL PRIMARY KEY,
+                              title VARCHAR(255) NOT NULL,
+                              author VARCHAR(255) NOT NULL,
+                              description VARCHAR(255) NOT NULL);`,
+                  `INSERT INTO books(title, author, description) VALUES
+                              ('PostgreSQL 11', 'Simon Riggs', 'Administration cookbook');`,
+                  `INSERT INTO tablelist(tablename, is_technical) VALUES
+                              ('books', FALSE);`,
+                  `INSERT INTO fieldlist(datatype_id, tablelist_id, length, precision, name, description) VALUES
+                              (1, 10, 255, 0, 'title', 'book title'),
+                              (1, 10, 255, 0, 'author', 'book author'),
+                              (1, 10, 255, 0, 'description', 'book description');`,
+                  `INSERT INTO menu(name, sequence, action, tablelist_id, description) VALUES
+                    ('Books', 10, 'list', 10, 'Books list');`,
                 ]
                 if (instructions.length > version) {
                   let currentVersion = instructions.length

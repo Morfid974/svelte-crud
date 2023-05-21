@@ -101,6 +101,60 @@ const getDatatypes = async (req, res) => {
     res.send(rows);
 };
 
+/** fields **/
+
+const getFields = async (req, res) => {
+    await userControl(req, res)
+    const {
+        rows
+    } = await pool.query(`
+        SELECT
+            fieldlist._id,
+            fieldlist.datatype_id,
+            fieldlist.tablelist_id,
+            fieldlist.length,
+            fieldlist.precision,
+            fieldlist.name,
+            fieldlist.description
+        FROM 
+            fieldlist,
+            tablelist
+        WHERE
+            tablelist.tablename = '${req.params.name}'
+        AND
+            tablelist._id = fieldlist.tablelist_id;`)
+    res.json(rows);
+};
+
+/** menu **/
+const getMenu = async (req, res) => {
+    await userControl(req, res)
+    const {
+        rows
+    } = await pool.query(`
+    SELECT 
+        _id,
+        sequence as sequence,
+        name as name,
+        action,
+        tablelist_id,
+        description,
+        ${nestQuery(`
+            SELECT
+                submenu._id,
+                submenu.sequence,
+                submenu.menu_id,
+                submenu.name,
+                submenu.action,
+                submenu.tablelist_id,
+                submenu.description
+            FROM submenu
+            WHERE submenu.menu_id = submenus._id
+        `)} AS submenus
+    FROM menu;`);
+    res.send(rows);
+};
+
 /** helpers **/
 function nestQuery(query) {
     return `
@@ -120,4 +174,6 @@ module.exports = {
     deleteTable,
     updateTable,
     getDatatypes,
+    getMenu,
+    getFields
 };
